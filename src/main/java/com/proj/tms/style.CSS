@@ -1,0 +1,27 @@
+.root {
+    background-color: lightblue;
+}
+
+.label {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.actiontarget {
+    font-size: 20px;
+}
+.button {
+    background-color: blue;
+    color: white;
+}
+
+.textfield {
+    font-size: 16px;
+}
+
+.hyperlink {
+    font-size: 16px;
+    text-decoration: underline;
+
+
+}
