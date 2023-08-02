@@ -5,7 +5,8 @@ import com.proj.Services.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+import java.util.Map;
+import java.util.HashMap;
 import java.util.List;
 
 @RestController
@@ -17,6 +18,21 @@ public class UserController {
     public UserController(UserService userService) {
         this.userService = userService;
         System.out.println("UserController created");
+    }
+
+    @PostMapping("/authenticate")
+    public ResponseEntity<Map<String, Object>> authenticateUser(@RequestBody User user) {
+        User authenticatedUser = userService.getUserByUsernameAndPassword(user.getUsername(), user.getPassword());
+
+        Map<String, Object> response = new HashMap<>();
+        if (authenticatedUser != null) {
+            response.put("isAuthenticated", true);
+            response.put("user", authenticatedUser);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } else {
+            response.put("isAuthenticated", false);
+            return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+        }
     }
 
     @GetMapping("/{id}")
