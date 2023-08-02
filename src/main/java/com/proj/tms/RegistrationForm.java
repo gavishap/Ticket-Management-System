@@ -2,7 +2,12 @@ package com.proj.tms;
 
 import com.proj.Services.UserService;
 import com.proj.Models.User;
-
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.net.URI;
+import java.net.http.HttpHeaders;
+import java.nio.charset.StandardCharsets;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -23,6 +28,9 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.layout.HBox;
 
+import org.springframework.stereotype.Component;
+
+@Component
 public class RegistrationForm {
     public void showRegistrationForm(Stage primaryStage) {
         primaryStage.setTitle("Registration Form");
@@ -78,18 +86,41 @@ public class RegistrationForm {
         btn.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {
-                User newUser = new User();
-                newUser.setUsername(userTextField.getText());
-                newUser.setPassword(pwBox.getText());
-                UserService userService = new UserService();
-                User createdUser = userService.createUser(newUser);
+                String username = userTextField.getText();
+                String password = pwBox.getText();
+                String json = "{ \"username\": \"" + username + "\", \"password\": \"" + password + "\" }";
 
-                if (createdUser != null) {
-                    actiontarget.setFill(Color.GREEN);
-                    actiontarget.setText("User registered successfully!");
-                } else {
+                HttpClient client = HttpClient.newHttpClient();
+                HttpRequest request = HttpRequest.newBuilder()
+                        .uri(URI.create("http://localhost:8081/api/users"))
+                        .header("Content-Type", "application/json")
+                        .POST(HttpRequest.BodyPublishers.ofString(json, StandardCharsets.UTF_8))
+                        .build();
+
+                // Print request info
+                System.out.println("Request to URL: " + request.uri());
+                System.out.println("Request method: " + request.method());
+                System.out.println("Request headers: " + request.headers());
+                System.out.println("Request body: " + json);
+
+                try {
+                    HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+                    // Print response info
+                    System.out.println("Response code: " + response.statusCode());
+                    System.out.println("Response headers: " + response.headers());
+                    System.out.println("Response body: " + response.body());
+
+                    if (response.statusCode() == 201) {
+                        actiontarget.setFill(Color.GREEN);
+                        actiontarget.setText("User registered successfully!");
+                    } else {
+                        actiontarget.setFill(Color.FIREBRICK);
+                        actiontarget.setText("Registration failed.");
+                    }
+                } catch (Exception ex) {
                     actiontarget.setFill(Color.FIREBRICK);
-                    actiontarget.setText("Registration failed.");
+                    actiontarget.setText("An error occurred: " + ex.getMessage());
                 }
             }
         });

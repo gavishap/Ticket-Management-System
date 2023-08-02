@@ -16,6 +16,7 @@ public class UserController {
 
     public UserController(UserService userService) {
         this.userService = userService;
+        System.out.println("UserController created");
     }
 
     @GetMapping("/{id}")

@@ -4,6 +4,9 @@ import com.proj.Models.Venue;
 import com.proj.DAO.VenueDAO;
 import java.sql.SQLException;
 
+import org.springframework.stereotype.Service;
+
+@Service
 public class VenueService {
     private VenueDAO venueDAO;
 

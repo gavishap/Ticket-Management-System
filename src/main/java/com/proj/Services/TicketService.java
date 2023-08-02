@@ -8,6 +8,9 @@ import com.proj.DAO.TicketDAO;
 import java.sql.SQLException;
 import java.util.List;
 
+import org.springframework.stereotype.Service;
+
+@Service
 public class TicketService {
     private TicketDAO ticketDAO;
 

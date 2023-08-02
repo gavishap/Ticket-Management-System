@@ -21,7 +21,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 @SpringBootApplication
-@ComponentScan({ "com.proj.tms", "com.proj.Utils", "com.proj.DAO", "com.proj.Models" })
+@ComponentScan({"com.proj.Controllers", "com.proj.Services", "com.proj.sql",  "com.proj.tms", "com.proj.Utils", "com.proj.DAO", "com.proj.Models" })
 public class TmsApplication extends Application {
 
     private ConfigurableApplicationContext context;
@@ -36,8 +36,6 @@ public class TmsApplication extends Application {
     public void init() throws Exception {
         String[] args = getParameters().getRaw().toArray(new String[0]);
         this.context = SpringApplication.run(TmsApplication.class, args);
-        this.eventDAO = context.getBean(EventDAO.class);
-        initDatabase();
     }
 
     public void initDatabase() {
@@ -52,7 +50,7 @@ public class TmsApplication extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        RegistrationForm regForm = new RegistrationForm();
+        RegistrationForm regForm = context.getBean(RegistrationForm.class);
         regForm.showRegistrationForm(primaryStage);
     }
 
