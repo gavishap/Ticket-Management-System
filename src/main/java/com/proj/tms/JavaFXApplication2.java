@@ -1,0 +1,195 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/javafx/FXMain.java to edit this template
+ */
+package com.proj.tms;
+
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.ComponentScan;
+
+import javafx.application.Application;
+import javafx.application.Application;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.geometry.HPos;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.layout.*;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.stage.Stage;
+import javafx.stage.Window;
+import java.io.*;
+import java.net.*;
+import java.time.*;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ *
+ * 
+ * @author arsal
+ */
+@SpringBootApplication
+@ComponentScan({ "com.proj.Controllers", "com.proj.Services", "com.proj.sql",
+        "com.proj.tms", "com.proj.Utils",
+        "com.proj.DAO", "com.proj.Models" })
+public class JavaFXApplication2 extends Application {
+
+    @Override
+    public void start(Stage primaryStage) {
+        primaryStage.setTitle("Create Account");
+
+        // Create the registration form grid pane
+        GridPane gridPane = createRegistrationFormPane(primaryStage);
+        // Add UI controls to the registration form grid pane
+        addUIControls(gridPane, primaryStage);
+        // Create a scene with registration form grid pane as the root node
+        Scene scene = new Scene(gridPane, 800, 500);
+        // Set the scene in primary stage
+        primaryStage.setScene(scene);
+
+        primaryStage.show();
+    }
+
+    private GridPane createRegistrationFormPane(Stage primaryStage) {
+        // Instantiate a new Grid Pane
+        GridPane gridPane = new GridPane();
+
+        // Position the pane at the center of the screen, both vertically and
+        // horizontally
+        gridPane.setAlignment(Pos.CENTER);
+
+        // Set a padding of 20px on each side
+        gridPane.setPadding(new Insets(40, 40, 40, 40));
+
+        // Set the horizontal gap between columns
+        gridPane.setHgap(10);
+
+        // Set the vertical gap between rows
+        gridPane.setVgap(10);
+
+        // Add Column Constraints
+
+        // columnOneConstraints will be applied to all the nodes placed in column one.
+        ColumnConstraints columnOneConstraints = new ColumnConstraints(100, 100, Double.MAX_VALUE);
+        columnOneConstraints.setHalignment(HPos.RIGHT);
+
+        // columnTwoConstraints will be applied to all the nodes placed in column two.
+        ColumnConstraints columnTwoConstrains = new ColumnConstraints(200, 200, Double.MAX_VALUE);
+        columnTwoConstrains.setHgrow(Priority.ALWAYS);
+
+        gridPane.getColumnConstraints().addAll(columnOneConstraints, columnTwoConstrains);
+
+        return gridPane;
+    }
+
+    private void addUIControls(GridPane gridPane, Stage primaryStage) {
+        // Add Header
+        Label headerLabel = new Label("Create User Account");
+        headerLabel.setFont(Font.font("Arial", FontWeight.BOLD, 24));
+        gridPane.add(headerLabel, 0, 0, 2, 1);
+        GridPane.setHalignment(headerLabel, HPos.CENTER);
+        GridPane.setMargin(headerLabel, new Insets(20, 0, 20, 0));
+
+        // Add Email Label
+        Label emailLabel = new Label("Email ID : ");
+        gridPane.add(emailLabel, 0, 2);
+
+        // Add Email Text Field
+        TextField emailField = new TextField();
+        emailField.setPrefHeight(40);
+        gridPane.add(emailField, 1, 2);
+
+        // Add Password Label
+        Label passwordLabel = new Label("Password : ");
+        gridPane.add(passwordLabel, 0, 3);
+
+        // Add Password Field
+        PasswordField passwordField = new PasswordField();
+        passwordField.setPrefHeight(40);
+        gridPane.add(passwordField, 1, 3);
+
+        Button buttonCreateNewAccount = new Button("Already have an account ? Sign in here");
+
+        gridPane.add(buttonCreateNewAccount, 0, 5, 2, 1);
+        GridPane.setHalignment(buttonCreateNewAccount, HPos.CENTER);
+
+        // Add Submit Button
+        Button submitButton = new Button("Sign up");
+        submitButton.setPrefHeight(40);
+        submitButton.setDefaultButton(true);
+        submitButton.setPrefWidth(100);
+        gridPane.add(submitButton, 0, 4, 2, 1);
+        GridPane.setHalignment(submitButton, HPos.CENTER);
+        GridPane.setMargin(submitButton, new Insets(20, 0, 20, 0));
+
+        submitButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+
+                if (emailField.getText().isEmpty() || !emailField.getText().matches("^(.+)@(.+)$*")) {
+                    showAlert(Alert.AlertType.ERROR, gridPane.getScene().getWindow(), "Form Error!",
+                            "Please enter your valid email id");
+                    return;
+                }
+                if (passwordField.getText().isEmpty() || passwordField.getText().length() < 7) {
+                    showAlert(Alert.AlertType.ERROR, gridPane.getScene().getWindow(), "Form Error!",
+                            "Please enter a password and it must be 7 characters long");
+                    return;
+                }
+
+                try {
+                    String jsonString = "{\"username\": \"" + emailField.getText() + "\", \"password\": \""
+                            + passwordField.getText() + "\"}";
+                    String response = new Utils().sendPOST(jsonString, "users");
+                    if (response != null) {
+                        SessionManager manager = new SessionManager();
+
+                        Dashboard dashboard = new Dashboard();
+                        dashboard.start(primaryStage);
+                    }
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+
+        buttonCreateNewAccount.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+
+                Dashboard dashboard = new Dashboard();
+                dashboard.start(primaryStage);
+            }
+        });
+    }
+
+    private void showAlert(Alert.AlertType alertType, Window owner, String title, String message) {
+        Alert alert = new Alert(alertType);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.initOwner(owner);
+        alert.show();
+    }
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String[] args) {
+        launch(args);
+    }
+
+}

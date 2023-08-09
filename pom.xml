@@ -76,7 +76,7 @@
 				<artifactId>javafx-maven-plugin</artifactId>
 				<version>0.0.6</version>
 				<configuration>
-					<mainClass>com.proj.tms.TmsApplication</mainClass>
+					<mainClass>com.proj.tms.JavaFXApplication2</mainClass>
 				</configuration>
 			</plugin>
 		</plugins>
